@@ -4,15 +4,6 @@
   "projectType": "application",
   "sourceRoot": "apps/iac/src",
   "targets": {
-    "init": {
-      "executor": "nx:run-commands",
-      "options": {
-        "color": true,
-        "cwd": "apps/iac",
-        "parallel": false,
-        "commands": ["npx cdk init"]
-      }
-    },
     "bootstrap": {
       "executor": "nx:run-commands",
       "options": {
