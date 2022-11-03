@@ -12,7 +12,9 @@ export const handler = (
   context: Context,
   callback: APIGatewayProxyCallback
 ): void => {
-  gi;
+  console.log(`Event: ${JSON.stringify(event, null, 2)}`);
+  console.log(`Body: ${JSON.stringify(event.body, null, 2)}`);
+  console.log(`Context: ${JSON.stringify(context, null, 2)}`);
   if (event.httpMethod === 'POST') {
     console.log('event.body', event.body);
 
