@@ -1,5 +1,6 @@
 import { Stack, App, StackProps } from 'aws-cdk-lib';
 import { JobServiceOne } from './stacks/api-stacks/job-service-one';
+import { JobServiceTwo } from './stacks/api-stacks/job-service-two';
 import { AcmStack } from './stacks/infra-stacks/acm-stack';
 import { ApiGatewayStack } from './stacks/infra-stacks/api-gateway-stack';
 import { IamStack } from './stacks/infra-stacks/iam-stack';
@@ -33,7 +34,7 @@ class MainStack extends Stack {
   readonly apiGatewayOneStack: ApiGatewayStack;
   readonly apiGatewayTwoStack: ApiGatewayStack;
   readonly jobServiceOne: JobServiceOne;
-  readonly jobServiceTwo: JobServiceOne;
+  readonly jobServiceTwo: JobServiceTwo;
   readonly iamStack: IamStack;
 
   constructor(scope: App, id: string, props: MainStackProps) {
@@ -77,6 +78,35 @@ class MainStack extends Stack {
         vpc: this.vpcOneStack.vpc,
         lambdaRole: this.iamStack.lambdaRole,
         restApi: this.apiGatewayOneStack.api,
+        hostedZone: this.route53Stack.hostedZone,
+      }
+    );
+
+    this.vpcTwoStack = new VpcStack(this, `${prefixer('vpc-stack-2')}`, {
+      ...props,
+      name: 'vpc2',
+    });
+
+    this.apiGatewayTwoStack = new ApiGatewayStack(
+      this,
+      `${prefixer('api-gateway-two')}`,
+      {
+        ...props,
+        name: 'two',
+        cert: this.acmStack.certificate,
+        hostedZone: this.route53Stack.hostedZone,
+        subdomainName: 'service2',
+      }
+    );
+
+    this.jobServiceTwo = new JobServiceTwo(
+      this,
+      `${prefixer('job-service-two-stack')}`,
+      {
+        ...props,
+        vpc: this.vpcTwoStack.vpc,
+        lambdaRole: this.iamStack.lambdaRole,
+        restApi: this.apiGatewayTwoStack.api,
         hostedZone: this.route53Stack.hostedZone,
       }
     );

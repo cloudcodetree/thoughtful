@@ -5,37 +5,28 @@ import { Role } from 'aws-cdk-lib/aws-iam';
 import { Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { LogLevel, NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { RetentionDays } from 'aws-cdk-lib/aws-logs';
-import {
-  ARecord,
-  HostedZone,
-  IHostedZone,
-  RecordTarget,
-} from 'aws-cdk-lib/aws-route53';
-import {
-  LoadBalancerTarget,
-  ApiGateway,
-} from 'aws-cdk-lib/aws-route53-targets';
+import { IHostedZone } from 'aws-cdk-lib/aws-route53';
 import path = require('path');
 import { prefixer } from '../../utils/utils';
 
-export interface JobServiceOneProps extends StackProps {
+export interface JobServiceTwoProps extends StackProps {
   vpc: IVpc;
   lambdaRole: Role;
   restApi: any;
   hostedZone: IHostedZone;
 }
 
-export class JobServiceOne extends Stack {
-  public readonly jobOneFunction: Function;
-  constructor(scope: Stack, id: string, props: JobServiceOneProps) {
+export class JobServiceTwo extends Stack {
+  public readonly jobTwoFunction: Function;
+  constructor(scope: Stack, id: string, props: JobServiceTwoProps) {
     super(scope, id, props);
 
     const { vpc, lambdaRole, restApi, hostedZone } = props;
     const fileBasePath = path.join(process.cwd(), '../../apps/api/src/app');
 
-    this.jobOneFunction = new NodejsFunction(
+    this.jobTwoFunction = new NodejsFunction(
       this,
-      `${prefixer('job-one-function')}`,
+      `${prefixer('job-two-function')}`,
       {
         runtime: Runtime.NODEJS_14_X,
         vpc,
@@ -46,7 +37,7 @@ export class JobServiceOne extends Stack {
         role: lambdaRole,
         timeout: Duration.seconds(5),
         handler: 'handler',
-        entry: `${fileBasePath}/job-one-function.ts`,
+        entry: `${fileBasePath}/job-two-function.ts`,
         logRetention: RetentionDays.ONE_DAY,
         environment: {
           ENV: `dev`,
@@ -60,8 +51,8 @@ export class JobServiceOne extends Stack {
       }
     );
 
-    const jobOneInt = new LambdaIntegration(this.jobOneFunction);
-    const jobOneRes = restApi.root.addResource('job');
-    jobOneRes.addMethod('POST', jobOneInt);
+    const jobTwoInt = new LambdaIntegration(this.jobTwoFunction);
+    const jobTwoRes = restApi.root.addResource('start');
+    jobTwoRes.addMethod('POST', jobTwoInt);
   }
 }

@@ -23,7 +23,7 @@ export const handler = (
     console.log('request', request);
     if (request.name) {
       const response: Response = {
-        service: 'service1',
+        service: 'service2',
         name: request.name,
         id: Math.floor(Math.random() * 1000),
       };

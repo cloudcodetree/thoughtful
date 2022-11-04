@@ -1,5 +1,5 @@
 import { Stack } from 'aws-cdk-lib';
-import { IVpc, Vpc } from 'aws-cdk-lib/aws-ec2';
+import { IVpc, SubnetType, Vpc, IIpAddresses } from 'aws-cdk-lib/aws-ec2';
 import { MainStackProps } from '../../main';
 import { prefixer } from '../../utils/utils';
 
@@ -16,6 +16,26 @@ export class VpcStack extends Stack {
 
     const { name } = props;
 
-    this.vpc = new Vpc(this, `${prefixer(name)}`);
+    this.vpc = new Vpc(this, `${prefixer(name)}`, {
+      natGateways: 1,
+      maxAzs: 1,
+      subnetConfiguration: [
+        {
+          name: 'private-subnet-1',
+          subnetType: SubnetType.PRIVATE_WITH_EGRESS,
+          cidrMask: 24,
+        },
+        {
+          name: 'public-subnet-1',
+          subnetType: SubnetType.PUBLIC,
+          cidrMask: 24,
+        },
+        {
+          name: 'isolated-subnet-1',
+          subnetType: SubnetType.PRIVATE_ISOLATED,
+          cidrMask: 24,
+        },
+      ],
+    });
   }
 }
